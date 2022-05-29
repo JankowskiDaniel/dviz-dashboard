@@ -26,7 +26,7 @@ dashboardPage(
                 box(width = 4, dataTableOutput("table1"), title="Matches", height = "50%"),
                 tabBox(width = 8, title="Match Details", height = "50%",
                        tabPanel("Overview", uiOutput("match_details")),
-                       tabPanel("Stats"),
+                       tabPanel("Stats", selectInput("selection", "Select", c("Ratings","K/D Ratio","HS %","Weapons")), uiOutput("stat")),
                        tabPanel("Heat Map")
                        )
               ),

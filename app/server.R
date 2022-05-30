@@ -103,9 +103,8 @@ function(input,
     match1 = input$table1_rows_selected
     if (length(match1)){
       row = filter(matches, X == match1)
-      hashname = select(row, ID)
-      #file = h[hashname]
-      #print(file)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
       if (input$selection == "Ratings"){
         # plot with ratings
         print("Ratings")

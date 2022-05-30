@@ -81,21 +81,22 @@ function(input,
     match1 = input$table1_rows_selected
     if (length(match1)){
       row = filter(matches, X == match1)
-      if (input$Select == "Ratings"){
+      
+      if (input$selection == "Ratings"){
         # plot with ratings
         print("Ratings")
-      } else if (input$Select == "K/D Ratio"){
+      } else if (input$selection == "K/D Ratio"){
         #plot with k/d ratio
         print("K/D Ratio")
-      } else if (input$Select == "HS %"){
+      } else if (input$selection == "HS %"){
         #plot with hs%
         print("HS %")
-      } else if (input$Select == "Weapons"){
+      } else if (input$selection == "Weapons"){
         #plot with weapons used in match
         print("Weapons")
       }
     } else {
-      print("<center><p>Match not selected</p></center>")
+      print("Match not selected")
     }
     
   })

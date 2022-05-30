@@ -12,6 +12,8 @@ library(shinydashboard)
 library(DT)
 library(dplyr)
 library(hash)
+library(readxl)
+library(plotly)
 
 matches = read.csv("../data/mainTable.csv")
 h <- hash()
@@ -99,7 +101,7 @@ function(input,
   
   })
   
-  output$stat = renderUI({
+  output$stat = renderPlotly({
     match1 = input$table1_rows_selected
     if (length(match1)){
       row = filter(matches, X == match1)
@@ -107,19 +109,37 @@ function(input,
       file = h[[hashname]]
       if (input$selection == "Ratings"){
         # plot with ratings
-        print("Ratings")
+        df = read_excel(file, sheet="Players")
+        plot_ly(df,
+                x = ~Rating, 
+                y = ~Name,
+                color = ~Team,
+                colors = c("#f1a340","#2c7bb6"),
+                type='bar') %>%
+          layout(yaxis = list(categoryorder = "total ascending", title=FALSE, tickfont = list(size = 15)),
+                 xaxis = list(range = c(0, 2.1), title=FALSE),
+                 legend = list(x = 1, y = 0.5, font = list(size = 15)))
       } else if (input$selection == "K/D Ratio"){
         #plot with k/d ratio
-        print("K/D Ratio")
       } else if (input$selection == "HS %"){
         #plot with hs%
-        print("HS %")
+        df = read_excel(file, sheet="Players")
+        df = rename(df, 'HSper' = 'HS%')
+        plot_ly(df,
+                x = ~HSper, 
+                y = ~Name,
+                color = ~Team,
+                colors = c("#f1a340","#2c7bb6"),
+                type='bar') %>%
+          layout(yaxis = list(categoryorder = "total ascending", title=FALSE, tickfont = list(size = 15)),
+                 xaxis = list(range = c(0, 101), title=FALSE),
+                 legend = list(x = 1, y = 0.5, font = list(size = 15)))
       } else if (input$selection == "Weapons"){
         #plot with weapons used in match
-        print("Weapons")
+
       }
     } else {
-      print("Match not selected")
+      
     }
     
   })

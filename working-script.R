@@ -7,7 +7,7 @@ a = img(src = "data/img/faze.jpg")
 a = "C:/Users/janko/OneDrive/Pulpit/Artificial intelligence/SEM4/DATA VISUALIZATION/dviz-dashboard/data/semi-finals/faze-spirit-2-0/faze-vs-spirit-m1-mirage-export.xlsx"
 
 library(readxl)
-faze_vs_spirit_m1_mirage_export <- read_excel(a, sheet = "Kills")
+faze_vs_spirit_m1_mirage_export <- read_excel(a, sheet = "Players")
 View(faze_vs_spirit_m1_mirage_export)
 library(hash)
 h <- hash()
@@ -28,3 +28,15 @@ h[["de_dust2_6168184025594020881653172467308458688"]] <- "../data/semi-finals/en
 h[["de_inferno_6167926485136471891653258966546676159"]] <- "../data/final-faze-navi/faze-vs-natus-vincere-m1-inferno-export.xlsx"
 h[["de_nuke_6121563804743798651653259127279941755"]] <- "../data/final-faze-navi/faze-vs-natus-vincere-m2-nuke-export.xlsx"
 
+library(plotly)
+library(ggplot2)
+faze_vs_spirit_m1_mirage_export = faze_vs_spirit_m1_mirage_export %>% mutate(Team, replace(Team, Team == "FaZe Clan", "Faze_Clan"))
+plot_ly(faze_vs_spirit_m1_mirage_export,
+        x = ~Rating, 
+        y = ~Name,
+        color = ~Team,
+        colors = c("#f1a340","#2c7bb6"),
+        type='bar') %>%
+  layout(yaxis = list(categoryorder = "total ascending", title=FALSE, tickfont = list(size = 15)),
+         xaxis = list(range = c(0, 2.1), title=FALSE),
+         legend = list(x = 1, y = 0.5, font = list(size = 15)))

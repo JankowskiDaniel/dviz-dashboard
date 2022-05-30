@@ -11,6 +11,12 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(dplyr)
+library(hash)
+
+loaddata = function(){
+  matches = read.csv("../data/mainTable.csv")
+}
+
 
 template = function(row){
   team1 = select(row, Name.team.1)
@@ -56,6 +62,7 @@ template = function(row){
 
 function(input, 
          output, session) { 
+  loaddata()
   output$table1 = renderDataTable({
     
     matches %>% select(Map, Name.team.1, Name.team.2)
@@ -81,7 +88,7 @@ function(input,
     match1 = input$table1_rows_selected
     if (length(match1)){
       row = filter(matches, X == match1)
-      
+      #filename = 
       if (input$selection == "Ratings"){
         # plot with ratings
         print("Ratings")

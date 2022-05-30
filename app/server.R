@@ -78,6 +78,18 @@ template = function(row){
   )
 }
 
+display_heatmap = function(row){
+  map = toString(select(row, ID))
+  glue::glue(
+    "<style>
+      
+    </style>
+    <img src=\"{{map}.png\" alt=\"{{map}\" id=\"heat\">
+    <p>Heat map based on kills</p>
+    ", .open="{{"
+  )
+}
+
 function(input, 
          output, session) { 
   output$table1 = renderDataTable({
@@ -142,6 +154,17 @@ function(input,
       
     }
     
+  })
+  
+  output$heatmap = renderUI({
+    match = input$table1_rows_selected
+    if (length(match)) {
+      row = filter(matches, X == match)
+      HTML(display_heatmap(row))
+      
+    } else {
+      HTML("<center><p>not selected</p></center>")
+    }
   })
 
   

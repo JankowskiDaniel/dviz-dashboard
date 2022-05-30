@@ -29,7 +29,7 @@ dashboardPage(
                 tabBox(width = 8, title="Match Details", height = "50%",
                        tabPanel("Overview", uiOutput("match_details")),
                        tabPanel("Stats", selectInput("selection", "Select", c("Ratings","K/D Ratio","HS %","Weapons")), plotlyOutput("stat")),
-                       tabPanel("Heat Map")
+                       tabPanel("Heat Map", uiOutput("heatmap"))
                        )
               ),
               fluidRow(

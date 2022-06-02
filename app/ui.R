@@ -11,19 +11,25 @@ library(shiny)
 library(shinydashboard)
 library(DT)
 library(plotly)
-
+library(flexdashboard)
 
 
 dashboardPage(
   dashboardHeader(title = "PGL Major Antwerp 2022"),
   dashboardSidebar(sidebarMenu(
-    menuItem("Matches", tabName = "dashboard", icon = icon("dashboard")),
-    menuItem("Players", tabName = "widgets", icon = icon("fa-solid fa-user")),
-    menuItem("Ranking", tabName = "teams", icon=icon("fa-solid fa-square-poll-vertical", lib = "font-awesome"))
+    menuItem("Matches", tabName = "dashboard", icon = icon("dashboard"))
   )),
   dashboardBody(
     tabItems(
       tabItem(tabName = "dashboard",
+              fluidRow(
+                box(width=4, gaugeOutput("avground"), title="AVG Round time", height="20%"),
+                box(width=4, title="Another box"),
+                box(width=4, title="Another box")
+                #valueBox(),
+                #valueBox()
+                
+              ),
               fluidRow(
                 box(width = 4, dataTableOutput("table1"), title="Matches", height = "50%"),
                 tabBox(width = 8, title="Match Details", height = "50%",
@@ -31,18 +37,9 @@ dashboardPage(
                        tabPanel("Stats", selectInput("selection", "Select", c("Ratings","K/D Ratio","HS %","Weapons")), plotlyOutput("stat")),
                        tabPanel("Heat Map", uiOutput("heatmap"))
                        )
-              ),
-              fluidRow(
-                box(width=12, title="Map details", height = "50%")
-                
               )
-              ),
-                tabItem(tabName="widgets",
-              h2("Players")
-      ),
-      tabItem(tabName="teams",
-              h2("Teams")
-              )
+              
+      )
     )
   )
   

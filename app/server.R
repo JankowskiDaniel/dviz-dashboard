@@ -14,6 +14,7 @@ library(dplyr)
 library(hash)
 library(readxl)
 library(plotly)
+library(flexdashboard)
 
 matches = read.csv("../data/mainTable.csv")
 h <- hash()
@@ -55,23 +56,35 @@ template = function(row){
           display: block;
           margin-left:auto;
           margin-right:auto;
+          max-height: 100%;
+          max-width: 100%;
           
         }
         #cont {
-          margin: auto;
-          width: 85%;
-          padding: 10px;
+          width: 100%;
+          text-align: center;
+          display: flex;
+          justify-content: center;
+          padding-top: 2%;
+        }
+        #logo {
+        width: 100px;
+        height: 100px;
         }
       
       </style>
       
       <div id=\"cont\">
+        <div id=\"logo\">
         <img src=\"{{team1}.png\" alt=\"team1\" width=120 height=86>
+        </div>
         <div id=\"main\">
         <center><h2>{{team1} <b>{{score_first}:{{score_second}</b> {{team2}</h2></center>
         <center><p>Map: {{map}</p></center>
         </div>
+        <div id=\"logo\">
         <img src=\"{{team2}.png\" alt=\"team2\" width=120 height=86>
+        </div>
       </div>
       <br>
       <hr width=75%>", .open="{{"
@@ -95,7 +108,7 @@ function(input,
   output$table1 = renderDataTable({
     
     matches %>% select(Map, Name.team.1, Name.team.2)
-  }, options = list(scrollX = TRUE), server = FALSE, selection="single")
+  }, options = list(scrollX = TRUE), server = FALSE, selection=list(mode = "single", selected = 1))
   
   
   
@@ -164,6 +177,21 @@ function(input,
       
     } else {
       HTML("<center><p>not selected</p></center>")
+    }
+  })
+  
+  output$avground = renderGauge({
+    match1 = input$table1_rows_selected
+    if(length(match1)){
+      row = filter(matches, X == match1)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
+      df = read_excel(file, sheet="Rounds")
+      df = rename(df, "duration" = "Duration (s)")
+      avgroundtime = round(mean(df$duration),2)
+      gauge(avgroundtime, min = 0, max = 200, symbol = "s")
+    } else {
+      print("No match selected.")
     }
   })
 

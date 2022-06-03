@@ -6,7 +6,7 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+library(flexdashboard)
 library(shiny)
 library(shinydashboard)
 library(DT)
@@ -14,7 +14,7 @@ library(dplyr)
 library(hash)
 library(readxl)
 library(plotly)
-library(flexdashboard)
+
 
 matches = read.csv("../data/mainTable.csv")
 h <- hash()
@@ -79,7 +79,7 @@ template = function(row){
         <img src=\"{{team1}.png\" alt=\"team1\" width=120 height=86>
         </div>
         <div id=\"main\">
-        <center><h2>{{team1} <b>{{score_first}:{{score_second}</b> {{team2}</h2></center>
+        <center><h2>{{team1} <b><br>{{score_first}:{{score_second}<br></b> {{team2}</h2></center>
         <center><p>Map: {{map}</p></center>
         </div>
         <div id=\"logo\">
@@ -95,10 +95,42 @@ display_heatmap = function(row){
   map = toString(select(row, ID))
   glue::glue(
     "<style>
-      
+      #heat {
+      max-height: 100%;
+      max-width: 100%
+      }
+      #heatdiv {
+      height: 600px;
+      width: 100%;
+      text-align: center;
+      display: flex;
+      justify-content: center;
+      padding-top: 2%;
+      }
     </style>
+    <div id=\"heatdiv\">
     <img src=\"{{map}.png\" alt=\"{{map}\" id=\"heat\">
-    <p>Heat map based on kills</p>
+    </div>
+    ", .open="{{"
+  )
+}
+
+display_map = function(row){
+  map = toString(select(row, Map))
+  glue::glue(
+    "<style>
+      #mapimg {
+        max-height: 100%;
+        max-width: 100%;
+      }
+      #mapdiv {
+        max-height: 100%;
+        max-width: 100%;
+      }
+    </style>
+    <div id=\"mapdiv\">
+    <img src=\"{{map}.png\" alt=\"{{map}\" id=\"mapimg\">
+    </div>
     ", .open="{{"
   )
 }
@@ -161,7 +193,38 @@ function(input,
                  legend = list(x = 1, y = 0.5, font = list(size = 15)))
       } else if (input$selection == "Weapons"){
         #plot with weapons used in match
-
+        df = select(read_excel(file, sheet="Kills"), one_of(c("Killer", "Killer team", "Victim", "Weapon")))
+        kwp_series <- df %>% group_by(Killer, Weapon) %>% summarise(n = n())
+        weapons_kils <- df %>% group_by(Weapon) %>% summarise(n = n())
+        
+        sc = data.frame("all-kills", "kills", sum(weapons_kils$n), "")
+        colnames(sc) = c("id", "label", "value", "parents")
+        for (i in 1:nrow(weapons_kils)) {
+          temp = data.frame(weapons_kils$Weapon[i], weapons_kils$Weapon[i], weapons_kils$n[i], "all-kills")
+          colnames(temp) = c("id", "label", "value", "parents")
+          sc <- bind_rows(sc, temp)
+        }
+        for (i in 1:nrow(kwp_series)) {
+          temp = data.frame(paste(kwp_series$Killer[i], "-", kwp_series$Weapon[i]), kwp_series$Killer[i], kwp_series$n[i], kwp_series$Weapon[i])
+          colnames(temp) = c("id", "label", "value", "parents")
+          sc <- bind_rows(sc, temp)
+        }
+        
+        
+        plt <- plot_ly()
+        plt <- plt %>%
+          add_trace(
+            ids = sc$id,
+            labels = sc$label,
+            parents = sc$parents,
+            values = sc$value,
+            type = 'sunburst',
+            branchvalues = 'total',
+            insidetextorientation='radial',
+            maxdepth = 3
+          )
+        plt <- plt %>% layout(sunburstcolorway = c('#003fde', '#7689a5', '#9da684', '#cf9481', '#ff009c', '#c0f693', '#8fddd1', '#57b5f5', '#007eff'))
+        
       }
     } else {
       
@@ -191,9 +254,129 @@ function(input,
       avgroundtime = round(mean(df$duration),2)
       gauge(avgroundtime, min = 0, max = 200, symbol = "s")
     } else {
-      print("No match selected.")
+     # print("No match selected.")
     }
   })
 
+  output$displaymap = renderUI({
+    match = input$table1_rows_selected
+    if (length(match)) {
+      row = filter(matches, X == match)
+      HTML(display_map(row))
+      
+    } else {
+      HTML("<center><p>not selected</p></center>")
+    }
+  })
+  
+  display_stats = function(df, team1, team2){
+    
+    p11 = toString(select(filter(arrange(filter(df, Team == team1), desc(Score)), row_number()==1), Name))
+    p12 = toString(select(filter(arrange(filter(df, Team == team1), desc(Score)), row_number()==2), Name))
+    p13 = toString(select(filter(arrange(filter(df, Team == team1), desc(Score)), row_number()==3), Name))
+    p14 = toString(select(filter(arrange(filter(df, Team == team1), desc(Score)), row_number()==4), Name))
+    p15 = toString(select(filter(arrange(filter(df, Team == team1), desc(Score)), row_number()==5), Name))
+    p21 = toString(select(filter(arrange(filter(df, Team == team2), desc(Score)), row_number()==1), Name))
+    p22 = toString(select(filter(arrange(filter(df, Team == team2), desc(Score)), row_number()==2), Name))
+    p23 = toString(select(filter(arrange(filter(df, Team == team2), desc(Score)), row_number()==3), Name))
+    p24 = toString(select(filter(arrange(filter(df, Team == team2), desc(Score)), row_number()==4), Name))
+    p25 = toString(select(filter(arrange(filter(df, Team == team2), desc(Score)), row_number()==5), Name))
+    
+    glue::glue(
+     "<style>
+         #parent {
+          margin: 0 auto;
+          display: flex;
+          justify-content: center;
+          width: 50%;
+          
+    }
+         #leftchild {
+          flex: 1;
+          margin: 10px;
+          text-align: left;
+          margin-right: 20px;
+         }
+    #rightchild {
+          flex: 1;
+          margin: 10px;
+          text-align: right;
+    }
+     </style>
+     <center><h3><u>Lineups</u></h3></center>
+     <center><p>(<span style=\"color:green\">Kills</span>/<span style=\"color:blue\">Assists</span>/<span style=\"color:red\">Deaths</span>)</p></center>
+     <div id=\"parent\">
+     
+      <div id=\"leftchild\">
+        <h4><b>{{team1}</b></h4>
+        <p>{{p11} (<span style=\"color:green\">{{toString(select(filter(df, Name == p11), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p11), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p11), Deaths))}</span>)</p>
+        <p>{{p12} (<span style=\"color:green\">{{toString(select(filter(df, Name == p12), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p12), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p12), Deaths))}</span>)</p>
+        <p>{{p13} (<span style=\"color:green\">{{toString(select(filter(df, Name == p13), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p13), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p13), Deaths))}</span>)</p>
+        <p>{{p14} (<span style=\"color:green\">{{toString(select(filter(df, Name == p14), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p14), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p14), Deaths))}</span>)</p>
+        <p>{{p15} (<span style=\"color:green\">{{toString(select(filter(df, Name == p15), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p15), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p15), Deaths))}</span>)</p>
+      </div>
+      <div id=\"rightchild\">
+        <h4><b>{{team2}</b></h4>
+        <p>(<span style=\"color:green\">{{toString(select(filter(df, Name == p21), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p21), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p21), Deaths))}</span>) {{p21}</p>
+        <p>(<span style=\"color:green\">{{toString(select(filter(df, Name == p22), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p22), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p22), Deaths))}</span>) {{p22}</p>
+        <p>(<span style=\"color:green\">{{toString(select(filter(df, Name == p23), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p23), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p23), Deaths))}</span>) {{p23}</p>
+        <p>(<span style=\"color:green\">{{toString(select(filter(df, Name == p24), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p24), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p24), Deaths))}</span>) {{p24}</p>
+        <p>(<span style=\"color:green\">{{toString(select(filter(df, Name == p25), Kills))}</span>/<span style=\"color:blue\">{{toString(select(filter(df, Name == p25), Assists))}</span>/<span style=\"color:red\">{{toString(select(filter(df, Name == p25), Deaths))}</span>) {{p25}</p>
+        
+      </div>
+     </div>
+     ", .open="{{" 
+    )
+  }
+  
+  output$tablestats = renderUI({
+    match = input$table1_rows_selected
+    if(length(match)){
+      row = filter(matches, X == match)
+      team1 = toString(select(row, Name.team.1))
+      team2 = toString(select(row, Name.team.2))
+      #print(team1)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
+      df = read_excel(file, sheet="Players")
+      HTML(display_stats(df, team1, team2))
+    } else {
+      
+    }
+  })
+  
+  
+  output$bombexp = renderValueBox({
+    match1 = input$table1_rows_selected
+    if(length(match1)){
+      row = filter(matches, X == match1)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
+      df = read_excel(file, sheet="Rounds")
+      df = rename(df, "bombexp" = "Bomb Exploded")
+      bombs = sum(df$bombexp)
+      valueBox(
+        bombs, "Bombs explosions",  color = "yellow", icon = icon("fa-solid fa-bombs")
+      )
+    }
+  })
+  
+  output$defused = renderValueBox({
+    match1 = input$table1_rows_selected
+    if(length(match1)){
+      row = filter(matches, X == match1)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
+      df = read_excel(file, sheet="Rounds")
+      df = rename(df, "bombdef" = "Bomb defused")
+      defs = sum(df$bombdef)
+      valueBox(
+        defs, "Bombs defused",  color = "blue", icon = icon("fa-solid fa-bombs")
+      )
+    } else {
+      print("not selected")
+    }
+  })
+  
   
 }

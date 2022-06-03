@@ -6,12 +6,12 @@
 #
 #    http://shiny.rstudio.com/
 #
-
+library(flexdashboard)
 library(shiny)
 library(shinydashboard)
 library(DT)
 library(plotly)
-library(flexdashboard)
+
 
 
 dashboardPage(
@@ -23,21 +23,19 @@ dashboardPage(
     tabItems(
       tabItem(tabName = "dashboard",
               fluidRow(
-                box(width=4, gaugeOutput("avground"), title="AVG Round time", height="20%"),
-                box(width=4, title="Another box"),
-                box(width=4, title="Another box")
-                #valueBox(),
-                #valueBox()
-                
+                box(width=3, gaugeOutput("avground"), title="AVG Round time"),
+                box(width=3, verticalLayout(valueBoxOutput("defused", width="100%"),valueBoxOutput("bombexp", width="100%"))),
+                box(width=3, valueBox(10 * 2, "New Orders", icon = icon("credit-card", width=12))),
+                box(width=3, title="Map", uiOutput("displaymap"))
               ),
               fluidRow(
                 box(width = 4, dataTableOutput("table1"), title="Matches", height = "50%"),
                 tabBox(width = 8, title="Match Details", height = "50%",
-                       tabPanel("Overview", uiOutput("match_details")),
+                       tabPanel("Overview", uiOutput("match_details"), uiOutput("tablestats")),
                        tabPanel("Stats", selectInput("selection", "Select", c("Ratings","K/D Ratio","HS %","Weapons")), plotlyOutput("stat")),
                        tabPanel("Heat Map", uiOutput("heatmap"))
                        )
-              )
+              ),
               
       )
     )

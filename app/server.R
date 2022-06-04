@@ -14,6 +14,7 @@ library(dplyr)
 library(hash)
 library(readxl)
 library(plotly)
+library(fontawesome)
 
 
 matches = read.csv("../data/mainTable.csv")
@@ -176,8 +177,17 @@ function(input,
           layout(yaxis = list(categoryorder = "total ascending", title=FALSE, tickfont = list(size = 15)),
                  xaxis = list(range = c(0, 2.1), title=FALSE),
                  legend = list(x = 1, y = 0.5, font = list(size = 15)))
-      } else if (input$selection == "K/D Ratio"){
-        #plot with k/d ratio
+      } else if (input$selection == "Equipment value"){
+        #plot with eq value
+        df = read_excel(file, sheet="Rounds")
+        df = rename(df, "eq1" = "Equipement value team 1")
+        df = rename(df, "eq2" = "Equipement value team 2")
+        team1 = toString(select(row, Name.team.1))
+        team2 = toString(select(row, Name.team.2))
+        plot_ly(df, x=~Number, y=~eq1, name = team1, type="scatter", mode="lines", line = list(color="rgb(0, 192, 239)", width = 2)) %>%
+            add_trace( y=~eq2, name=team2, line = list(color = "rgb(216, 27, 96)", width = 2)) %>%
+            layout(xaxis = list(title = "Round", dtick=1, tick0=1),
+                             yaxis = list(tickprefix="$", title=""))
       } else if (input$selection == "HS %"){
         #plot with hs%
         df = read_excel(file, sheet="Players")
@@ -356,7 +366,7 @@ function(input,
       df = rename(df, "bombexp" = "Bomb Exploded")
       bombs = sum(df$bombexp)
       valueBox(
-        bombs, "Bombs explosions",  color = "yellow", icon = icon("fa-solid fa-bombs")
+        bombs, "BOMBS EXPLOSIONS",  color = "yellow", icon = icon("bomb")
       )
     }
   })
@@ -371,10 +381,38 @@ function(input,
       df = rename(df, "bombdef" = "Bomb defused")
       defs = sum(df$bombdef)
       valueBox(
-        defs, "Bombs defused",  color = "blue", icon = icon("fa-solid fa-bombs")
+        defs, "BOMBS DEFUSED",  color = "blue", icon = icon("hand-holding-medical", lib = "font-awesome")
       )
     } else {
-      print("not selected")
+      #print("not selected")
+    }
+  })
+  
+  output$team1money = renderValueBox({
+    match = input$table1_rows_selected
+    if(length(match)){
+      row = filter(matches, X == match)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
+      df = read_excel(file, sheet="Rounds")
+      df = rename(df, "eq" = "Equipement value team 1")
+      money = sum(df$eq)
+      team1 = toString(select(row, Name.team.1))
+      valueBox(paste0(money, "$"), paste0(toupper(team1), " - TOTAL EQ VALUE"), icon=icon("money-bill"))
+    }
+  })
+  
+  output$team2money = renderValueBox({
+    match = input$table1_rows_selected
+    if(length(match)){
+      row = filter(matches, X == match)
+      hashname = toString(select(row, ID))
+      file = h[[hashname]]
+      df = read_excel(file, sheet="Rounds")
+      df = rename(df, "eq" = "Equipement value team 2")
+      money = sum(df$eq)
+      team2 = toString(select(row, Name.team.2))
+      valueBox(paste0(money, "$"), paste0(toupper(team2), " - TOTAL EQ VALUE"), color = "maroon", icon=icon("money-bill"))
     }
   })
   

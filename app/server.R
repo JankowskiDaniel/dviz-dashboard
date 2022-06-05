@@ -15,26 +15,27 @@ library(hash)
 library(readxl)
 library(plotly)
 library(fontawesome)
+library(rsconnect)
 
 
-matches = read.csv("../data/mainTable.csv")
+matches = read.csv("www/data/mainTable.csv")
 h <- hash()
-h[["de_nuke_6156803976143969921652992887300824718"]] <- "../data/quarter-finals/nip-faze-1-2/nip-vs-faze-m1-nuke-export.xlsx"
-h[["de_overpass_6246294808284798401652992894371821767"]] <- "../data/quarter-finals/nip-faze-1-2/nip-vs-faze-m2-overpass-export.xlsx"
-h[["de_inferno_6129343516433510251652992896293226512"]] <- "../data/quarter-finals/nip-faze-1-2/nip-vs-faze-m3-inferno-export.xlsx"
-h[["de_vertigo_6169713723863713901653001495292796899"]] <- "../data/quarter-finals/spirit-furia-2-0/spirit-vs-furia-m1-vertigo-export.xlsx"
-h[["de_ancient_6189363384583379821653001499268779520"]] <- "../data/quarter-finals/spirit-furia-2-0/spirit-vs-furia-m2-ancient-export.xlsx"
-h[["de_vertigo_6227803555223546171653072046257518894"]] <- "../data/quarter-finals/ence-copenhagen-2-0/ence-vs-copenhagen-flames-m1-vertigo-export.xlsx"
-h[["de_nuke_6144653951013944391653072050285187203"]] <- "../data/quarter-finals/ence-copenhagen-2-0/ence-vs-copenhagen-flames-m2-nuke-export.xlsx"
-h[["de_inferno_6134814769764762671653079632385597301"]] <- "../data/quarter-finals/navi-heroic-2-1/natus-vincere-vs-heroic-m1-inferno-export.xlsx"
-h[["de_ancient_6132695164325158151653088410392388334"]] <- "../data/quarter-finals/navi-heroic-2-1/natus-vincere-vs-heroic-m2-ancient-export.xlsx"
-h[["de_nuke_6158233889413883561653088414297335272"]] <- "../data/quarter-finals/navi-heroic-2-1/natus-vincere-vs-heroic-m3-nuke-export.xlsx"
-h[["de_mirage_6149234265054256971653161108318016110"]] <- "../data/semi-finals/faze-spirit-2-0/faze-vs-spirit-m1-mirage-export.xlsx"
-h[["de_dust2_6164417349477338771653161146556651229"]] <- "../data/semi-finals/faze-spirit-2-0/faze-vs-spirit-m2-dust2-export.xlsx"
-h[["de_nuke_6120393644743638661653172461261545720"]] <- "../data/semi-finals/ence-navi-0-2/ence-vs-natus-vincere-m1-nuke-export.xlsx"
-h[["de_dust2_6168184025594020881653172467308458688"]] <- "../data/semi-finals/ence-navi-0-2/ence-vs-natus-vincere-m2-dust2-export.xlsx"
-h[["de_inferno_6167926485136471891653258966546676159"]] <- "../data/final-faze-navi/faze-vs-natus-vincere-m1-inferno-export.xlsx"
-h[["de_nuke_6121563804743798651653259127279941755"]] <- "../data/final-faze-navi/faze-vs-natus-vincere-m2-nuke-export.xlsx"
+h[["de_nuke_6156803976143969921652992887300824718"]] <- "www/data/quarter-finals/nip-faze-1-2/nip-vs-faze-m1-nuke-export.xlsx"
+h[["de_overpass_6246294808284798401652992894371821767"]] <- "www/data/quarter-finals/nip-faze-1-2/nip-vs-faze-m2-overpass-export.xlsx"
+h[["de_inferno_6129343516433510251652992896293226512"]] <- "www/data/quarter-finals/nip-faze-1-2/nip-vs-faze-m3-inferno-export.xlsx"
+h[["de_vertigo_6169713723863713901653001495292796899"]] <- "www/data/quarter-finals/spirit-furia-2-0/spirit-vs-furia-m1-vertigo-export.xlsx"
+h[["de_ancient_6189363384583379821653001499268779520"]] <- "www/data/quarter-finals/spirit-furia-2-0/spirit-vs-furia-m2-ancient-export.xlsx"
+h[["de_vertigo_6227803555223546171653072046257518894"]] <- "www/data/quarter-finals/ence-copenhagen-2-0/ence-vs-copenhagen-flames-m1-vertigo-export.xlsx"
+h[["de_nuke_6144653951013944391653072050285187203"]] <- "www/data/quarter-finals/ence-copenhagen-2-0/ence-vs-copenhagen-flames-m2-nuke-export.xlsx"
+h[["de_inferno_6134814769764762671653079632385597301"]] <- "www/data/quarter-finals/navi-heroic-2-1/natus-vincere-vs-heroic-m1-inferno-export.xlsx"
+h[["de_ancient_6132695164325158151653088410392388334"]] <- "www/data/quarter-finals/navi-heroic-2-1/natus-vincere-vs-heroic-m2-ancient-export.xlsx"
+h[["de_nuke_6158233889413883561653088414297335272"]] <- "www/data/quarter-finals/navi-heroic-2-1/natus-vincere-vs-heroic-m3-nuke-export.xlsx"
+h[["de_mirage_6149234265054256971653161108318016110"]] <- "www/data/semi-finals/faze-spirit-2-0/faze-vs-spirit-m1-mirage-export.xlsx"
+h[["de_dust2_6164417349477338771653161146556651229"]] <- "www/data/semi-finals/faze-spirit-2-0/faze-vs-spirit-m2-dust2-export.xlsx"
+h[["de_nuke_6120393644743638661653172461261545720"]] <- "www/data/semi-finals/ence-navi-0-2/ence-vs-natus-vincere-m1-nuke-export.xlsx"
+h[["de_dust2_6168184025594020881653172467308458688"]] <- "www/data/semi-finals/ence-navi-0-2/ence-vs-natus-vincere-m2-dust2-export.xlsx"
+h[["de_inferno_6167926485136471891653258966546676159"]] <- "www/data/final-faze-navi/faze-vs-natus-vincere-m1-inferno-export.xlsx"
+h[["de_nuke_6121563804743798651653259127279941755"]] <- "www/data/final-faze-navi/faze-vs-natus-vincere-m2-nuke-export.xlsx"
 
 
 
@@ -265,6 +266,7 @@ function(input,
       gauge(avgroundtime, min = 0, max = 200, symbol = "s")
     } else {
      # print("No match selected.")
+      gauge(0, min = 0, max = 200, symbol = "s")
     }
   })
 
@@ -368,6 +370,10 @@ function(input,
       valueBox(
         bombs, "BOMBS EXPLOSIONS",  color = "yellow", icon = icon("bomb")
       )
+    } else {
+      valueBox(
+        0, "BOMBS EXPLOSIONS",  color = "yellow", icon = icon("bomb")
+      )
     }
   })
   
@@ -384,7 +390,9 @@ function(input,
         defs, "BOMBS DEFUSED",  color = "blue", icon = icon("hand-holding-medical", lib = "font-awesome")
       )
     } else {
-      #print("not selected")
+      valueBox(
+        0, "BOMBS DEFUSED",  color = "blue", icon = icon("hand-holding-medical", lib = "font-awesome")
+      )
     }
   })
   
@@ -399,6 +407,8 @@ function(input,
       money = sum(df$eq)
       team1 = toString(select(row, Name.team.1))
       valueBox(paste0(money, "$"), paste0(toupper(team1), " - TOTAL EQ VALUE"), icon=icon("money-bill"))
+    } else {
+      valueBox(paste0(NaN, "$"), paste0(toupper(NaN), " - TOTAL EQ VALUE"), icon=icon("money-bill"))
     }
   })
   
@@ -413,7 +423,40 @@ function(input,
       money = sum(df$eq)
       team2 = toString(select(row, Name.team.2))
       valueBox(paste0(money, "$"), paste0(toupper(team2), " - TOTAL EQ VALUE"), color = "maroon", icon=icon("money-bill"))
+    } else {
+      valueBox(paste0(NaN, "$"), paste0(toupper(NaN), " - TOTAL EQ VALUE"), color = "maroon", icon=icon("money-bill"))
     }
+  })
+  
+  output$secabout = renderUI({
+    text = glue::glue("
+      <style>
+        #abouttext {
+          font-size: 20px;
+        }
+        </style>
+                      <center><h1>About</h1></center>
+                      <div id=\"abouttext\">
+                      <p>The dashboard presents data on the knockout matches of the <b>PGL Major Antwerp 2022 </b>(one of the most important CS:GO tournaments this year). 
+                       After selecting a match played between two teams, the user gets access to comprehensive visualizations, which helps analyse the match and 
+                      evaluate player’s performance: </p>
+                      <ul>
+                        <li>Result of the match</li>
+                        <li>Map played during the match</li>
+                        <li>Lineups of the teams</li>
+                        <li>Rating of each player</li>
+                        <li>Teams equipment value during the match</li>
+                        <li>Headshot percentage of each player</li>
+                        <li>Distribution of kills between players (in case of used weapons)</li>
+                        <li>Kill heat map</li>
+                        <li>Number of defused bombs and explosions</li>
+                        <li>Total equipment value of each team</li>
+                        <li>Average round duration</li>
+                      </ul>
+                      </div>
+  ", .open = "{{"
+                        )
+    HTML(text)
   })
   
   

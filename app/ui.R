@@ -18,7 +18,8 @@ library(fontawesome)
 dashboardPage(
   dashboardHeader(title = "PGL Major Antwerp 2022"),
   dashboardSidebar(sidebarMenu(
-    menuItem("Matches", tabName = "dashboard", icon = icon("gamepad"))
+    menuItem("Matches", tabName = "dashboard", icon = icon("gamepad")),
+    menuItem("About", tabName = "about", icon = icon("question"))
   )),
   dashboardBody(
     tabItems(
@@ -38,7 +39,9 @@ dashboardPage(
                        )
               ),
               
-      )
+      ),
+      tabItem(tabName = "about",
+              box(width = 12, uiOutput("secabout")))
     )
   )
   
